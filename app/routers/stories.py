@@ -16,8 +16,8 @@ async def create_story(payload: NameStoryCreate, db: AsyncSession = Depends(get_
     if not payload.title:
         raise HTTPException(status_code=400, detail="Title is required")
     story = NameStory(user_id=user.id, title=payload.title, status="pending", research_id=payload.research_id)
-    async with db.begin():
-        db.add(story)
+    db.add(story)
+    await db.commit()
     await db.refresh(story)
 
     # Dispatch celery task; fallback to background if celery unavailable

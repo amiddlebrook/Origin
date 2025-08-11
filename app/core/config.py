@@ -1,5 +1,8 @@
 from typing import List, Optional
-from pydantic import BaseSettings
+from pydantic import ConfigDict
+from pydantic_settings import BaseSettings
+
+
 class Settings(BaseSettings):
     APP_NAME: str = "NameStory Explorer"
     APP_VERSION: str = "0.1.0"
@@ -15,7 +18,6 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["*"]
     ARTIFACTS_DIR: str = "data/artifacts"
     MEDIA_DIR: str = "data/media"
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 settings = Settings()

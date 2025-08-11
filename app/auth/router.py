@@ -21,8 +21,8 @@ async def register(payload: s.UserCreate, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed = utils.get_password_hash(payload.password)
     user = User(email=payload.email, hashed_password=hashed)
-    async with db.begin():
-        db.add(user)
+    db.add(user)
+    await db.commit()
     await db.refresh(user)
     return {"id": user.id, "email": user.email}
 

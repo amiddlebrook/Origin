@@ -1,5 +1,5 @@
 from typing import Optional, Any, List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 # Name Story Schemas
 class NameStoryCreate(BaseModel):
@@ -17,8 +17,7 @@ class NameStoryOut(BaseModel):
     illustration_url: Optional[str]
     status: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 # Oral History Schemas
 class OralHistoryCreate(BaseModel):
@@ -34,5 +33,4 @@ class OralHistoryOut(BaseModel):
     duration_seconds: Optional[int]
     transcript: Optional[str]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

@@ -12,8 +12,8 @@ router = APIRouter()
 @router.post("/", response_model=schemas.ResearchOut, status_code=status.HTTP_201_CREATED)
 async def create_research(payload: schemas.ResearchCreate, db: AsyncSession = Depends(get_db), user = Depends(get_current_user)):
     new = models.Research(name=payload.name, status="pending", user_id=user.id)
-    async with db.begin():
-        db.add(new)
+    db.add(new)
+    await db.commit()
     await db.refresh(new)
     try:
         run_name_research.delay(new.id, payload.name)

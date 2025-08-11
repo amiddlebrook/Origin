@@ -13,6 +13,6 @@ def test_openapi_json_served():
 
 def test_docs_route_available():
     with TestClient(app) as client:
-        resp = client.get("/docs", allow_redirects=True)
+        resp = client.get("/docs")
         assert resp.status_code == 200
         assert "text/html" in resp.headers.get("content-type", "").lower()

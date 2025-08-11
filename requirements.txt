@@ -4,6 +4,8 @@ aiohttp
 SQLAlchemy>=1.4
 aiosqlite
 pydantic
+pydantic-settings
+email-validator
 beautifulsoup4
 lxml
 celery[redis]

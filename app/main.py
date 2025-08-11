@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.core.logging import configure_logging
 from app.routers import research
 from app.auth import router as auth_router
+from app.routers.health import router as health_router
 import logging
 from app.database import engine, Base
 import os
@@ -19,6 +20,7 @@ def create_app():
     app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS, allow_credentials=True, allow_methods=['*'], allow_headers=['*'])
     app.include_router(auth_router, prefix='/auth', tags=['auth'])
     app.include_router(research.router, prefix='/research', tags=['research'])
+    app.include_router(health_router, tags=['health'])
     # Lazy import to avoid circulars
     from app.routers.stories import router as stories_router
     app.include_router(stories_router, prefix='/stories', tags=['stories'])

@@ -16,3 +16,6 @@ python-multipart
 ruff
 pytest
 httpx
+alembic
+pytest-asyncio
+pytest-cov

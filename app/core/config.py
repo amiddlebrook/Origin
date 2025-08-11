@@ -16,8 +16,30 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-prod"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60*24*7
     CORS_ORIGINS: List[str] = ["*"]
+    # File storage
     ARTIFACTS_DIR: str = "data/artifacts"
     MEDIA_DIR: str = "data/media"
+    MEDIA_UPLOAD_DIR: str = "data/media/uploads"
+    
+    # Media processing
+    MAX_IMAGE_SIZE_MB: int = 10  # 10MB max image size
+    MAX_VIDEO_SIZE_MB: int = 100  # 100MB max video size
+    THUMBNAIL_SIZE: tuple[int, int] = (300, 300)  # Width, Height in pixels
+    
+    # Allowed file types
+    ALLOWED_IMAGE_TYPES: list[str] = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp"
+    ]
+    
+    ALLOWED_VIDEO_TYPES: list[str] = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+        "video/x-ms-wmv"
+    ]
 
     model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 settings = Settings()

@@ -4,6 +4,34 @@ A platform for discovering the origins and stories behind names, with support fo
 
 ## Features
 
+### Bulk Operations
+
+Efficiently manage large datasets with our comprehensive bulk operations:
+
+- **Bulk Create/Update/Delete**: Perform batch operations on research items, stories, and oral histories
+- **Workspace Management**: Add or remove multiple resources from workspaces in a single request
+- **Error Handling**: Detailed error reporting for failed operations
+- **Duplicate Handling**: Optional duplicate detection and skipping
+
+### Rate Limiting
+
+Protect your API with configurable rate limiting:
+
+- **Flexible Rate Limits**: Different limits for different endpoints
+- **User & IP Based**: Rate limiting by user account or IP address
+- **Detailed Headers**: Real-time rate limit information in response headers
+- **Configurable Windows**: Adjustable time windows for rate limits
+
+### Analytics & Insights
+
+Gain valuable insights into user behavior and content performance with our comprehensive analytics:
+
+- **User Activity Tracking**: Monitor user actions and system events
+- **Search Analytics**: Understand what users are searching for and how they interact with search results
+- **Content Engagement**: Track views, interactions, and time spent on content
+- **Custom Reporting**: Generate reports on various metrics with flexible filtering
+- **Real-time Dashboards**: Monitor key metrics in real-time
+
 ### Oral Histories
 
 Origin allows users to upload, manage, and process oral history recordings. The system supports:
@@ -37,17 +65,186 @@ Origin allows users to upload, manage, and process oral history recordings. The 
 - Create and manage name stories with rich text and media
 - Associate stories with research data
 - Share and explore community-contributed stories
+- Bulk import/export capabilities
 
 ### Research Tools
 
 - Automated name research using multiple data sources
 - Background processing for long-running research tasks
 - Structured results with source attribution
+- Bulk research operations for large datasets
 
-## Setup
+### Collaboration Features
 
-1. Clone the repository
-2. Install dependencies:
+- Shared workspaces for team collaboration
+- Comments and annotations on resources
+- Version history and change tracking
+- Fine-grained access control
+
+### Webhook Support
+
+- Real-time event notifications
+- Configurable webhook endpoints
+- Retry mechanisms for failed deliveries
+- HMAC signature verification
+
+### Analytics
+
+- User activity tracking
+- Usage statistics
+- Performance metrics
+- Custom reporting
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- PostgreSQL 12+ (or SQLite for development)
+- Redis (for background tasks and rate limiting)
+- FFmpeg (for media processing)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/origin.git
+   cd origin
+   ```
+
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Configure environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+5. Initialize the database:
+   ```bash
+   alembic upgrade head
+   ```
+
+6. Start the development server:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+## API Documentation
+
+Once the server is running, you can access:
+
+- **Interactive API Docs**: http://localhost:8000/docs
+- **Alternative API Docs**: http://localhost:8000/redoc
+- **OpenAPI Schema**: http://localhost:8000/openapi.json
+
+## Configuration
+
+Key configuration options (set in `.env` or environment variables):
+
+```ini
+# Database
+DATABASE_URL=postgresql+asyncpg://user:password@localhost/origin
+
+# Security
+SECRET_KEY=your-secret-key
+ACCESS_TOKEN_EXPIRE_MINUTES=1440  # 24 hours
+
+# CORS (comma-separated origins)
+CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+
+# File Storage
+MEDIA_UPLOAD_DIR=./media
+MAX_UPLOAD_SIZE=104857600  # 100MB
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+DEFAULT_RATE_LIMIT=60/1m  # 60 requests per minute
+
+# Webhooks
+WEBHOOK_TIMEOUT=5  # seconds
+WEBHOOK_MAX_RETRIES=3
+
+# Analytics
+ANALYTICS_ENABLED=true
+```
+
+## Development
+
+### Running Tests
+
+```bash
+pytest
+```
+
+### Code Style
+
+We use `black` for code formatting and `isort` for import sorting:
+
+```bash
+black .
+isort .
+```
+
+### Database Migrations
+
+To create a new migration:
+
+```bash
+alembic revision --autogenerate -m "Your migration message"
+```
+
+To apply migrations:
+
+```bash
+alembic upgrade head
+```
+
+## Deployment
+
+### Docker
+
+Build and run with Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+### Production
+
+For production deployment, consider using:
+
+- **ASGI Server**: Uvicorn with Gunicorn
+- **Process Manager**: Systemd or Supervisor
+- **Reverse Proxy**: Nginx or Traefik
+- **Database**: PostgreSQL with connection pooling
+- **Caching**: Redis
+- **Background Tasks**: Celery with Redis/RabbitMQ
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+MIT
+
+## Support
+
+For support, please open an issue in the GitHub repository.
    ```bash
    pip install -r requirements.txt
    ```

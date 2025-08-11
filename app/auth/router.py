@@ -4,7 +4,7 @@ from app.database import get_db
 from app.models_user import User
 from app.auth import utils
 from app.auth import schemas as s
-from app.schemas import ResearchOut
+from app.schemas.research import ResearchOut
 from app.core.config import settings
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import timedelta

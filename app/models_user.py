@@ -19,3 +19,6 @@ class User(Base):
     name_stories = relationship("NameStory", back_populates="user", cascade="all, delete-orphan")
     oral_histories = relationship("OralHistory", back_populates="user", cascade="all, delete-orphan")
     research = relationship("Research", back_populates="user", cascade="all, delete-orphan")
+    activities = relationship("UserActivity", back_populates="user", cascade="all, delete-orphan")
+    search_queries = relationship("SearchQuery", back_populates="user", cascade="all, delete-orphan")
+    content_interactions = relationship("ContentInteraction", back_populates="user", cascade="all, delete-orphan")

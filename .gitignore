@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.dist/
+.build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+
+# App data
+/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Node/Playwright caches (if used later)
+node_modules/
+playwright/.cache/
+
+# Docker
+*.pid
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 100
+extend-select = ["E", "F"]
+exclude = [
+  ".git",
+  ".venv",
+  "venv",
+  "data",
+  "node_modules",
+]

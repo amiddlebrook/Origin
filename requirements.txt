@@ -13,3 +13,5 @@ passlib[bcrypt]
 python-jose[cryptography]
 playwright
 python-multipart
+ruff
+pytest

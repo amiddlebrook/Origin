@@ -27,6 +27,12 @@ jobs:
         run: |
           python -m compileall .
 
-      - name: Lint placeholder
+      - name: Lint (ruff)
         run: |
-          echo "Add ruff/flake8/pytest later"
+          ruff --version
+          # TODO: enforce non-zero exit once codebase is fully lint-clean
+          ruff check . --exit-zero
+
+      - name: Test (pytest - smoke)
+        run: |
+          pytest -q

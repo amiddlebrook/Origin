@@ -14,7 +14,7 @@ class ResearchBase(BaseSchema):
     content: Optional[Any] = None
     is_public: bool = False
     tags: list[str] = Field(default_factory=list)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    research_metadata: dict[str, Any] = Field(default_factory=dict)
 
 class ResearchCreate(ResearchBase):
     """Schema for creating a new research item."""
@@ -27,12 +27,12 @@ class ResearchUpdate(BaseSchema):
     content: Optional[Any] = None
     is_public: Optional[bool] = None
     tags: Optional[list[str]] = None
-    metadata: Optional[dict[str, Any]] = None
+    research_metadata: Optional[dict[str, Any]] = None
 
 class ResearchOut(ResearchBase):
     """Schema for research item output."""
     id: int
-    created_by_id: int
+    created_by_id: int = Field(..., alias="user_id")
     created_at: datetime
     updated_at: Optional[datetime] = None
     status: str = "pending"

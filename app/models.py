@@ -14,6 +14,7 @@ class Research(Base):
     # Status and results
     status = Column(String(50), default="pending", nullable=False)  # pending, running, done, error
     result = Column(JSON, nullable=True)
+    research_metadata = Column(JSON, nullable=False, server_default="{}")
     error = Column(Text, nullable=True)
     
     # Timestamps

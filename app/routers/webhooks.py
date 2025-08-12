@@ -2,17 +2,14 @@
 API endpoints for managing webhooks.
 """
 from typing import List, Optional
-from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.auth.router import get_current_user
 from app.models_user import User
 from app.models_webhooks import WebhookEventType
-from app.services.webhook_service import WebhookService, get_webhook_service
-from app.core.config import settings
+from app.services.webhook_service import WebhookService
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 

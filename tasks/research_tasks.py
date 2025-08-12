@@ -64,13 +64,13 @@ def run_name_research(research_id: int, name: str):
         return {"status": "ok", "result": res}
     except Exception as e:
         logger.exception("Celery task failed: %s", e)
-        async def mark_error():
+        async def mark_error(exc: Exception):
             async with AsyncSessionLocal() as db:
                 async with db.begin():
                     await db.execute(
                         update(Research)
                         .where(Research.id == research_id)
-                        .values(status='error', error=str(e))
+                        .values(status='error', error=str(exc))
                     )
-        run_async(mark_error())
+        run_async(mark_error(e))
         raise

@@ -2,15 +2,11 @@
 API endpoints for collaboration features.
 """
 from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
-from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 
-from app.database import get_db
 from app.auth.router import get_current_user
 from app.models_user import User
 from app.services.collaboration_service import CollaborationService, get_collaboration_service
-from app.core.config import settings
 
 router = APIRouter(prefix="/collaboration", tags=["collaboration"])
 

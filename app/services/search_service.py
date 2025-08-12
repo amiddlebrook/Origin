@@ -2,13 +2,11 @@
 Search service for full-text search across the application.
 Supports both PostgreSQL (using TSVECTOR) and SQLite (using FTS5).
 """
-from typing import List, Dict, Any, Optional, Union, Type, TypeVar, Generic, Tuple
+from typing import List, Dict, Any, Optional, Type, TypeVar, Tuple
 from datetime import datetime
-from sqlalchemy import select, or_, and_, func, text, inspect, ColumnElement
+from sqlalchemy import select, and_, func, text, ColumnElement
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, InstrumentedAttribute
-from sqlalchemy.dialects import postgresql, sqlite
-from sqlalchemy.sql.expression import cast, case
+from sqlalchemy.orm import selectinload
 
 from app.models_story import NameStory, OralHistory
 from app.models_user import User

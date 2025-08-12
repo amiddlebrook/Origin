@@ -2,9 +2,7 @@
 API endpoints for media uploads and management.
 """
 import os
-from typing import List, Optional
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, status
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db

@@ -2,8 +2,11 @@
 Database models for collaboration features.
 """
 from datetime import datetime
-from typing import List, Optional, Dict, Any
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean, JSON
+from typing import List, Optional, Dict, Any, TYPE_CHECKING
+from sqlalchemy import Integer, String, Text, ForeignKey, DateTime, Boolean
+
+if TYPE_CHECKING:
+    from app.models_user import User
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
 from app.database import Base

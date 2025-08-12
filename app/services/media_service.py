@@ -2,14 +2,11 @@
 Media processing service for handling image and video uploads.
 """
 import os
-import shutil
 import uuid
-from pathlib import Path
-from typing import Tuple, Optional, BinaryIO
+from typing import Tuple, Optional
 from fastapi import UploadFile, HTTPException, status
 from PIL import Image, ImageOps
 import imageio.v3 as iio
-from io import BytesIO
 import logging
 
 from app.core.config import settings

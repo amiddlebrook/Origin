@@ -1,10 +1,8 @@
 import os
 import sys
-import asyncio
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -16,7 +14,6 @@ sys.path.insert(0, ROOT_DIR)
 
 # Import database models first to avoid circular imports
 from app.database import Base, get_db
-from app.core.config import settings
 
 # Use in-memory SQLite for testing
 TEST_SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -55,7 +52,6 @@ def test_app() -> Generator[FastAPI, None, None]:
     app = create_app()
     
     # Override the database dependency
-    from app.database import get_db
     app.dependency_overrides[get_db] = override_get_db
     
     yield app

@@ -2,22 +2,17 @@
 Service for handling bulk operations on data.
 """
 import logging
-from typing import List, Dict, Any, Optional, Union, Type, TypeVar, Generic
+from typing import List, Dict, Any, Optional, Type, TypeVar
 from datetime import datetime
-from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, and_, or_, func
-from sqlalchemy.orm import selectinload, joinedload
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
-from app.database import get_db
 from app.models_research import Research
 from app.models_stories import NameStory
 from app.models_oral_history import OralHistory
 from app.models_collaboration import WorkspaceResource, WorkspaceMember
-from app.core.security import get_password_hash
-from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

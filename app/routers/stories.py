@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select
 from app.database import get_db
 from app.auth.router import get_current_user
-from app import models
 from app.models_story import NameStory
 from app.schemas_story import NameStoryCreate, NameStoryOut
 from tasks.story_tasks import generate_name_story

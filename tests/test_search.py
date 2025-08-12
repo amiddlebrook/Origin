@@ -4,20 +4,14 @@ Tests for the search functionality with both PostgreSQL and SQLite backends.
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
-from datetime import datetime, timezone
 
 from app.main import app
-from app.database import Base, get_db, engine, SQLALCHEMY_DATABASE_URL
+from app.database import Base, engine
 from app.models_user import User
 from app.models_story import NameStory, OralHistory
 # Import search schemas from the correct module path
 from app.schemas.search import (
-    SearchResultType, 
-    SearchRequest, 
-    SearchResponse,
-    SearchSuggestionItem,
-    SearchSuggestionsResponse
+    SearchResultType
 )
 
 # Test data

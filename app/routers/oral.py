@@ -1,21 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, BackgroundTasks, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
-from typing import List, Optional, Dict, Any
+from app import models
+from sqlalchemy import select
+from typing import Optional, Dict, Any
 import os
 import magic
-from datetime import datetime
 from pathlib import Path
-from fastapi.responses import JSONResponse
 from app.database import get_db
 from app.auth.router import get_current_user
-from app.models_story import OralHistory, NameStory
-from app.schemas_story import OralHistoryOut, OralHistoryUpdate
+from app.models_story import OralHistory
+from app.schemas_story import OralHistoryOut
 from app.services.storage import save_upload
 from app.tasks.oral_worker import run_oral_processing_in_background
 import logging
 import time
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 
 logger = logging.getLogger(__name__)
 
@@ -182,22 +181,46 @@ async def upload_oral_history(
             detail="Error saving file. Please try again later."
         )
     
-    # Create the oral history record
+    # Save the uploaded file
     try:
-        oral_history = OralHistory(
-        
-        # Create the oral history record
-        item = OralHistory(
-            user_id=user.id,
-            story_id=story_id,
-            title=title,
-            file_path=rel_path,
-            status="pending"
+        abs_path, rel_path = save_upload(file, "oral_histories")
+    except Exception as e:
+        logger.error(f"Error saving file {file.filename}: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error saving file. Please try again later."
         )
-        
-    async with db.begin():
-        db.add(item)
-    await db.refresh(item)
+
+    # Create the oral history record
+    item = OralHistory(
+        user_id=current_user.id,
+        story_id=story_id,
+        title=title,
+        file_path=rel_path,
+        status="pending",
+        file_size_bytes=file_size,
+        mime_type=file.content_type
+    )
+
+    try:
+        async with db.begin():
+            db.add(item)
+        await db.refresh(item)
+    except Exception as e:
+        logger.error(f"Error creating oral history record: {str(e)}", exc_info=True)
+        # Clean up the orphaned file
+        try:
+            os.remove(abs_path)
+        except OSError:
+            pass # Ignore if file cannot be removed
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not create oral history record."
+        )
+
+    # Enqueue background processing
+    background_tasks.add_task(run_oral_processing_in_background, item.id)
+
     return item
 
 @router.get("/", response_model=list[OralHistoryOut])

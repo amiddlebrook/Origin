@@ -3,8 +3,7 @@ Search API endpoints for full-text search across the application.
 Supports both PostgreSQL (TSVECTOR) and SQLite (FTS5) backends.
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from fastapi.responses import JSONResponse
-from typing import List, Optional, Dict, Any, Union, Type
+from typing import Optional, Type
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db, Base
@@ -239,12 +238,10 @@ async def search_model(
     """
     search_service = SearchService(db, current_user)
     
-    # Map model_type to the appropriate search method and model class
+    # Map model_type to the appropriate search method
     if model_type == 'stories':
-        model_class = NameStory
         search_method = search_service.search_stories
     elif model_type == 'oral_histories':
-        model_class = OralHistory
         search_method = search_service.search_oral_histories
     else:
         raise HTTPException(

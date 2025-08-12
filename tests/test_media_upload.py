@@ -2,15 +2,11 @@
 Tests for the media upload API endpoints.
 """
 import os
-import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 import io
-import tempfile
-from pathlib import Path
 
 from app.main import app
-from app.core.config import settings
 
 # Test client
 client = TestClient(app)

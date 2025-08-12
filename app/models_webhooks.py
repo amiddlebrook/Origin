@@ -4,7 +4,7 @@ Database models for webhooks.
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from enum import Enum
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean, JSON, Enum as SQLEnum
+from sqlalchemy import Integer, String, Text, ForeignKey, DateTime, Boolean, JSON, Enum as SQLEnum
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
 from app.database import Base

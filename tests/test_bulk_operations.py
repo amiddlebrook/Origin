@@ -5,8 +5,7 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Dict, Any
-import json
+from typing import Dict
 
 from app.main import app
 from app.database import get_db, Base, async_session_maker

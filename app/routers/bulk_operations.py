@@ -1,16 +1,12 @@
 """
 API endpoints for bulk operations.
 """
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Body, Query
-from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
 from app.auth.router import get_current_user
 from app.models_user import User
 from app.services.bulk_operations import BulkOperationsService, BulkOperationError, get_bulk_operations_service
-from app.core.config import settings
 
 router = APIRouter(prefix="/bulk", tags=["bulk"])
 

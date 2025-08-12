@@ -1,9 +1,8 @@
 import logging
-import asyncio
 from urllib.parse import quote_plus
 from app.services.scraping.base_scraper import BaseScraper
 from app.database import AsyncSessionLocal
-from sqlalchemy import select, update
+from sqlalchemy import update
 from app.models import Research
 
 logger = logging.getLogger(__name__)

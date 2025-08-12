@@ -1,18 +1,15 @@
 """
 Analytics API endpoints for tracking and retrieving user activity and usage statistics.
 """
-from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.auth.router import get_current_user
 from app.models_user import User
 from app.services.analytics_service import AnalyticsService
-from app.core.config import settings
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 

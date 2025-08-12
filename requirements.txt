@@ -12,6 +12,7 @@ celery[redis]
 redis
 fake-useragent
 passlib[bcrypt]
+Pillow
 python-jose[cryptography]
 playwright
 python-multipart

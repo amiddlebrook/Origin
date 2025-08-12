@@ -3,11 +3,11 @@ Service for handling collaboration features like workspaces, comments, and annot
 """
 import logging
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Union
-from uuid import UUID
+from typing import List, Dict, Any, Optional
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, and_, or_, func
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy import select, update, delete, and_, func
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.models_user import User
@@ -15,7 +15,6 @@ from app.models_collaboration import (
     Workspace, WorkspaceMember, WorkspaceResource, 
     Comment, Annotation, VersionHistory
 )
-from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +89,7 @@ class CollaborationService:
             )
         else:
             # Only public workspaces if no user
-            query = query.where(Workspace.is_public == True)
+            query = query.where(Workspace.is_public)
         
         result = await self.db.execute(query)
         workspace = result.scalars().first()
@@ -494,7 +493,7 @@ class CollaborationService:
             (Comment.resource_type == resource_type) &
             (Comment.resource_id == resource_id) &
             (Comment.parent_comment_id.is_(None) if include_replies else True) &
-            (Comment.is_deleted == False)
+            (not Comment.is_deleted)
         ).order_by(Comment.created_at.asc())
         
         if include_replies:
@@ -643,11 +642,11 @@ class CollaborationService:
         # Apply privacy filter
         if user:
             query = query.where(
-                (Annotation.is_private == False) |
+                (not Annotation.is_private) |
                 (Annotation.created_by_id == user.id)
             )
         else:
-            query = query.where(Annotation.is_private == False)
+            query = query.where(not Annotation.is_private)
         
         result = await self.db.execute(
             query.options(selectinload(Annotation.created_by))

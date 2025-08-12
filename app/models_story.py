@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, JSON, ForeignKey, event, DDL, func
+from sqlalchemy import Column, Integer, String, DateTime, Text, JSON, ForeignKey, DDL, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.schema import FetchedValue
@@ -30,8 +30,6 @@ def create_tsvector_trigger(
         function_name = f"{table_name}_search_vector_update"
     if not trigger_name:
         trigger_name = f"update_{table_name}_search_vector"
-        
-    columns = ", ".join(f'NEW.{col}' for col in search_columns)
     
     return DDL("""
         CREATE OR REPLACE FUNCTION %(function_name)s() RETURNS TRIGGER AS $$

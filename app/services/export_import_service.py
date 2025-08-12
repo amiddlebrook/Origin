@@ -5,25 +5,23 @@ import os
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, BinaryIO
-from pathlib import Path
+from typing import Any, Dict
 import io
+import tempfile
 
-from fastapi import HTTPException, status, UploadFile, File
+from fastapi import HTTPException, status, UploadFile, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlalchemy.future import select
 import pandas as pd
 from docx import Document
-from docx.shared import Inches
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
-from reportlab.lib.units import inch
 
 from app.core.config import settings
 from app.database import get_db
-from app.models_user import User
 from app.models import Research, NameStory, OralHistory
 
 logger = logging.getLogger(__name__)
@@ -194,9 +192,6 @@ class ExportImportService:
         Returns:
             Path to the exported PDF file
         """
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.lib import colors
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
         
         filepath = os.path.join(self.export_dir, f"{filename}.pdf")
         doc = SimpleDocTemplate(filepath, pagesize=letter)

@@ -2,8 +2,8 @@
 Analytics service for tracking and retrieving user activity and usage statistics.
 """
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Union
-from sqlalchemy import func, and_, or_
+from typing import Dict, Optional
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 

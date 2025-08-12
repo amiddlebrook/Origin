@@ -80,11 +80,13 @@ async def process_oral_history(oral_history_id: int, file_path: str) -> None:
         oral_history.status = "completed"
         oral_history.duration = result.get("duration")
         oral_history.transcript = result.get("transcript")
-        oral_history.metadata = {
-            **oral_history.metadata or {},
-            **result.get("metadata", {}),
-            "processing_metrics": metrics.get_metrics()
-        }
+
+        # Safely merge metadata
+        current_metadata = oral_history.metadata or {}
+        current_metadata.update(result.get("metadata", {}))
+        current_metadata["processing_metrics"] = metrics.get_metrics()
+        oral_history.metadata = current_metadata
+
         oral_history.processing_completed_at = time.time()
         
         await db.commit()
@@ -111,11 +113,13 @@ async def process_oral_history(oral_history_id: int, file_path: str) -> None:
             try:
                 oral_history.status = "failed"
                 oral_history.error_message = str(e)
-                oral_history.metadata = {
-                    **(oral_history.metadata or {}),
-                    "error_traceback": str(e.__traceback__),
-                    "processing_metrics": metrics.get_metrics()
-                }
+
+                # Safely merge metadata for error
+                error_metadata = oral_history.metadata or {}
+                error_metadata["error_traceback"] = str(e.__traceback__)
+                error_metadata["processing_metrics"] = metrics.get_metrics()
+                oral_history.metadata = error_metadata
+
                 await db.commit()
             except Exception as db_error:
                 logger.error(f"Failed to update failed status: {db_error}", exc_info=True)

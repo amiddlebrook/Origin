@@ -2,20 +2,16 @@
 Rate limiting service for API endpoints.
 """
 import time
-from typing import Dict, Optional, List, Tuple, Any
-from datetime import datetime, timedelta
+from typing import Tuple
 import asyncio
 from collections import defaultdict
 from functools import wraps
 
-from fastapi import Request, HTTPException, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import RequestResponseEndpoint
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from app.core.config import settings
 from app.database import get_db
-from app.models_user import User
 from app.auth.router import get_current_user
 
 class RateLimiter:
@@ -50,9 +46,7 @@ class RateLimiter:
         }
     
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        ""
-        ASGI middleware to handle rate limiting.
-        """
+        """ASGI middleware to handle rate limiting."""
         if scope["type"] != "http":  # pragma: no cover
             await self.app(scope, receive, send)
             return

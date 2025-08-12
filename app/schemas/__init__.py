@@ -101,7 +101,7 @@ __all__ = [
     'StorageUsageData',
     
     # Search (legacy)
-    'SearchType',
+    'SearchResultType',
     
     # Root schemas
     'ResearchOut'

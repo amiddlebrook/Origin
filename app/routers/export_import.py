@@ -2,7 +2,6 @@
 API endpoints for exporting and importing data.
 """
 import os
-from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Query
 from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.auth.router import get_current_user
 from app.models_user import User
-from app.services.export_import_service import ExportImportService, get_export_import_service
+from app.services.export_import_service import get_export_import_service
 from app.core.config import settings
 
 router = APIRouter(prefix="/export-import", tags=["export-import"])

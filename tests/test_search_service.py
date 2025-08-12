@@ -5,7 +5,6 @@ These tests focus on the search service layer without going through the FastAPI 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime, timezone
 
 from app.database import Base
 from app.core.config import settings

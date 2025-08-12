@@ -4,7 +4,7 @@ Analytics-related Pydantic models for request and response validation.
 from datetime import datetime, date
 from typing import Optional, List, Dict, Any
 from enum import Enum
-from pydantic import Field, HttpUrl
+from pydantic import Field
 
 from ..base import BaseSchema
 

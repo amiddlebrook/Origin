@@ -1,4 +1,5 @@
-import os, asyncio, logging
+import asyncio
+import logging
 logger = logging.getLogger(__name__)
 async def render_page(url: str, timeout: int = 15):
     # optional import to avoid heavy dependency if not installed

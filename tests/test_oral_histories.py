@@ -3,7 +3,6 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from unittest.mock import patch, MagicMock
 
 # Test data
 TEST_AUDIO_FILE = "test_audio.wav"
@@ -70,7 +69,7 @@ async def test_list_oral_histories(client: TestClient, auth_headers: dict, db: A
         f.write(b'dummy audio data')
     
     with open("test_audio.wav", "rb") as f:
-        upload_response = client.post(
+        client.post(
             "/oral-histories/upload",
             headers=auth_headers,
             files={"file": ("test_audio.wav", f, "audio/wav")},

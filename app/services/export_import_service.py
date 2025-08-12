@@ -22,7 +22,8 @@ from reportlab.lib import colors
 
 from app.core.config import settings
 from app.database import get_db
-from app.models import Research, NameStory, OralHistory
+from app.models import Research
+from app.models_story import NameStory, OralHistory
 
 logger = logging.getLogger(__name__)
 

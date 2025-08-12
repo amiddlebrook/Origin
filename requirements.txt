@@ -12,10 +12,14 @@ celery[redis]
 redis
 fake-useragent
 passlib[bcrypt]
+pandas
 Pillow
+imageio
 python-jose[cryptography]
+python-docx
 playwright
 python-multipart
+reportlab
 ruff
 pytest
 httpx
@@ -25,3 +29,4 @@ pytest-cov
 psycopg2-binary>=2.9.3
 python-magic>=0.4.24
 python-multipart>=0.0.5
+PyPDF2

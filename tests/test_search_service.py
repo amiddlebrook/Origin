@@ -13,7 +13,7 @@ from app.models_story import NameStory, OralHistory
 from app.services.search_service import SearchService
 
 # Use the test database URL from settings
-TEST_DATABASE_URL = settings.ASYNC_DATABASE_URL
+TEST_DATABASE_URL = settings.DATABASE_URL
 
 # Create async engine and session factory
 engine = create_async_engine(TEST_DATABASE_URL, echo=True)

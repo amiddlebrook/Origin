@@ -51,10 +51,5 @@ class ContentInteraction(Base):
     interaction_data = Column(JSON, nullable=True)  # Additional data about the interaction
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
     
-    # Index for faster lookups by content
-    __table_args__ = (
-        {'sqlite_autoindex': True},
-    )
-    
     # Relationships
     user = relationship("User", back_populates="content_interactions")

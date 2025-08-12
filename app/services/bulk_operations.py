@@ -12,11 +12,10 @@ from sqlalchemy.orm import selectinload, joinedload
 from pydantic import BaseModel, ValidationError
 
 from app.database import get_db
-from app.models_research import Research
-from app.models_stories import NameStory
-from app.models_oral_history import OralHistory
+from app.models import Research
+from app.models_story import NameStory, OralHistory
 from app.models_collaboration import WorkspaceResource, WorkspaceMember
-from app.core.security import get_password_hash
+from app.auth.utils import get_password_hash
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -571,6 +570,7 @@ class BulkOperationsService:
             'errors': errors
         }
 
+from fastapi import Depends
 # Helper function to get the bulk operations service
-def get_bulk_operations_service(db: AsyncSession):
+def get_bulk_operations_service(db: AsyncSession = Depends(get_db)):
     return BulkOperationsService(db)

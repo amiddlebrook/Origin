@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Union, BinaryIO
 from pathlib import Path
 import io
 
-from fastapi import HTTPException, status, UploadFile, File
+from fastapi import HTTPException, status, UploadFile, File, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import pandas as pd
@@ -24,7 +24,8 @@ from reportlab.lib.units import inch
 from app.core.config import settings
 from app.database import get_db
 from app.models_user import User
-from app.models import Research, NameStory, OralHistory
+from app.models import Research
+from app.models_story import NameStory, OralHistory
 
 logger = logging.getLogger(__name__)
 

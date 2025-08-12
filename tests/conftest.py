@@ -2,134 +2,121 @@ import os
 import sys
 import asyncio
 import pytest
-from fastapi import FastAPI
+import pytest_asyncio
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-from typing import AsyncGenerator, Generator
+from typing import AsyncGenerator, Dict
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.types import JSON, TEXT
 
-# Ensure project root is on sys.path so `import app` works in tests
+# --- Custom Compilers for SQLite ---
+
+@compiles(JSONB, "sqlite")
+def compile_jsonb_sqlite(type_, compiler, **kw):
+    """Compile JSONB as JSON for sqlite."""
+    return compiler.visit_JSON(type_, **kw)
+
+@compiles(TSVECTOR, "sqlite")
+def compile_tsvector_sqlite(type_, compiler, **kw):
+    """Compile TSVECTOR as TEXT for sqlite."""
+    return compiler.visit_TEXT(type_, **kw)
+
+# --- Path Setup ---
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT_DIR)
 
-# Import database models first to avoid circular imports
+from app.main import create_app
 from app.database import Base, get_db
 from app.core.config import settings
+from app.models_user import User
+from app.auth.utils import get_password_hash
 
-# Use in-memory SQLite for testing
-TEST_SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-
-# Create test engine and session
-engine = create_async_engine(
-    TEST_SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-    echo=True,  # Enable SQL query logging for tests
-)
-
+# --- Test Database Setup ---
+TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = sessionmaker(
-    autocommit=False, 
-    autoflush=False, 
-    bind=engine, 
-    class_=AsyncSession, 
-    expire_on_commit=False
+    bind=engine, class_=AsyncSession, expire_on_commit=False
 )
 
-# Override the get_db dependency
 async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Dependency override for getting a DB session."""
     async with TestingSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+        yield session
 
-# Fixture to create test database tables
-@pytest.fixture(scope="function")
-def test_app() -> Generator[FastAPI, None, None]:
-    # Import here to avoid circular imports
-    from app.main import create_app
-    
-    # Create a new FastAPI app for testing
-    app = create_app()
-    
-    # Override the database dependency
-    from app.database import get_db
-    app.dependency_overrides[get_db] = override_get_db
-    
-    yield app
-    
-    # Clear overrides after test
-    app.dependency_overrides.clear()
+# --- Pytest Fixtures ---
 
-# Fixture to get a test database session
-@pytest.fixture(scope="function")
-async def db_session(test_app: FastAPI) -> AsyncGenerator[AsyncSession, None]:
-    # Create all tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    
-    async with TestingSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-    
-    # Drop all tables after test
+@pytest.fixture(scope="session")
+def event_loop():
+    """Create an instance of the default event loop for the whole session."""
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
+
+@pytest_asyncio.fixture(scope="function", autouse=True)
+async def setup_database():
+    """Create database tables for each test function, and drop them after."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
-    # Dispose the engine
-    await engine.dispose()
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
-# Fixture to get a test client with overridden database
-@pytest.fixture(scope="function")
-def test_client(test_app: FastAPI) -> TestClient:
-    with TestClient(test_app) as client:
-        # Set default headers
-        client.headers.update({"Content-Type": "application/json"})
-        yield client
 
-# Fixture for authenticated client
+@pytest_asyncio.fixture(scope="function")
+async def db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Yields a new DB session for each test."""
+    async with TestingSessionLocal() as session:
+        yield session
+
+
 @pytest.fixture(scope="function")
-def auth_client(test_client: TestClient) -> TestClient:
-    import uuid
-    
-    # Register a test user
-    email = f"test_{uuid.uuid4().hex[:8]}@example.com"
-    password = "testpassword123"
-    
-    # Register
-    response = test_client.post(
-        "/auth/register",
-        json={"email": email, "password": password}
+def client(db_session: AsyncSession) -> TestClient:
+    """Provides a TestClient with the database dependency overridden for each test."""
+    app = create_app()
+    app.dependency_overrides[get_db] = lambda: db_session
+    with TestClient(app) as c:
+        yield c
+
+
+@pytest_asyncio.fixture(scope="function")
+async def test_user_session(db_session: AsyncSession) -> User:
+    """Creates a test user for a test function."""
+    user = User(
+        email="testuser@example.com",
+        hashed_password=get_password_hash("testpassword"),
+        is_active=True,
     )
-    assert response.status_code in (200, 201), f"Failed to register test user: {response.text}"
-    
-    # Login to get token
-    form_data = {
-        "username": email,
-        "password": password,
-    }
-    
-    response = test_client.post(
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest.fixture(scope="function")
+def auth_headers(client: TestClient, test_user_session: User) -> Dict[str, str]:
+    """Provides auth headers for a test function."""
+    response = client.post(
         "/auth/token",
-        data=form_data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
+        data={"username": test_user_session.email, "password": "testpassword"},
     )
-    assert response.status_code == 200, f"Failed to login test user: {response.text}"
-    
-    # Extract token
-    token_data = response.json()
-    token = token_data.get("access_token")
-    assert token is not None, "No access token in response"
-    
-    # Update client headers with auth token
-    test_client.headers.update({"Authorization": f"Bearer {token}"})
-    
-    return test_client
+    if response.status_code != 200:
+        # This will help debug if token generation fails
+        print("Failed to get auth token:", response.text)
+    assert response.status_code == 200
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+@pytest_asyncio.fixture
+async def test_user(db_session: AsyncSession) -> User:
+    """Creates a fresh test user for each test function."""
+    user = User(
+        email="testfuncuser@example.com",
+        hashed_password=get_password_hash("testpassword"),
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user

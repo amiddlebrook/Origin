@@ -1,31 +1,16 @@
 """
-Tests for the search functionality with both PostgreSQL and SQLite backends.
+Tests for the search functionality.
 """
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
-from datetime import datetime, timezone
+from sqlalchemy.ext.asyncio import AsyncSession
+import pytest_asyncio
 
-from app.main import app
-from app.database import Base, get_db, engine, SQLALCHEMY_DATABASE_URL
 from app.models_user import User
 from app.models_story import NameStory, OralHistory
-# Import search schemas from the correct module path
-from app.schemas.search import (
-    SearchResultType, 
-    SearchRequest, 
-    SearchResponse,
-    SearchSuggestionItem,
-    SearchSuggestionsResponse
-)
+from app.schemas.search import SearchResultType
 
 # Test data
-TEST_USER = {
-    "email": "test@example.com",
-    "password": "testpassword"
-}
-
 TEST_STORY = {
     "title": "Test Story",
     "narrative": "This is a test story about family history and genealogy.",
@@ -39,68 +24,41 @@ TEST_ORAL_HISTORY = {
     "status": "published"
 }
 
-@pytest.fixture(scope="module")
-def test_app():
-    """Create a test client with overridden dependencies."""
-    # Setup test database
-    Base.metadata.create_all(bind=engine)
-    
-    # Create test data
-    with Session(engine) as session:
-        # Create test user
-        user = User(email=TEST_USER["email"])
-        user.set_password(TEST_USER["password"])
-        session.add(user)
-        session.commit()
-        
-        # Create test story
-        story = NameStory(
-            title=TEST_STORY["title"],
-            narrative=TEST_STORY["narrative"],
-            status=TEST_STORY["status"],
-            user_id=user.id
-        )
-        session.add(story)
-        
-        # Create test oral history
-        oral_history = OralHistory(
-            title=TEST_ORAL_HISTORY["title"],
-            summary=TEST_ORAL_HISTORY["summary"],
-            transcript=TEST_ORAL_HISTORY["transcript"],
-            status=TEST_ORAL_HISTORY["status"],
-            user_id=user.id
-        )
-        session.add(oral_history)
-        session.commit()
-    
-    # Create test client
-    with TestClient(app) as test_client:
-        yield test_client
-    
-    # Cleanup
-    Base.metadata.drop_all(bind=engine)
-
-@pytest.fixture(scope="module")
-def auth_headers(test_app):
-    """Get authentication headers."""
-    # Login to get access token
-    response = test_app.post(
-        "/auth/token",
-        data={"username": TEST_USER["email"], "password": TEST_USER["password"]}
+@pytest_asyncio.fixture(scope="function")
+async def setup_search_test_data(db_session: AsyncSession, test_user_session: User):
+    """Set up test data for search tests."""
+    # test_user_session is the user from conftest.
+    # Create test story
+    story = NameStory(
+        title=TEST_STORY["title"],
+        narrative=TEST_STORY["narrative"],
+        status=TEST_STORY["status"],
+        user_id=test_user_session.id
     )
-    token = response.json()["access_token"]
-    return {"Authorization": f"Bearer {token}"}
+    db_session.add(story)
 
-def test_search_stories(test_app, auth_headers):
+    # Create test oral history
+    oral_history = OralHistory(
+        title=TEST_ORAL_HISTORY["title"],
+        summary=TEST_ORAL_HISTORY["summary"],
+        transcript=TEST_ORAL_HISTORY["transcript"],
+        status=TEST_ORAL_HISTORY["status"],
+        user_id=test_user_session.id
+    )
+    db_session.add(oral_history)
+    await db_session.commit()
+
+
+def test_search_stories(client: TestClient, auth_headers: dict, setup_search_test_data):
     """Test searching stories."""
     search_request = {
         "query": "family history",
-        "include": [SearchResultType.STORY],
+        "include": [SearchResultType.STORY.value],
         "page": 1,
         "page_size": 10
     }
     
-    response = test_app.post(
+    response = client.post(
         "/search",
         json=search_request,
         headers=auth_headers
@@ -113,16 +71,16 @@ def test_search_stories(test_app, auth_headers):
     assert len(data["results"]) > 0
     assert any(s["title"] == TEST_STORY["title"] for s in data["results"])
 
-def test_search_oral_histories(test_app, auth_headers):
+def test_search_oral_histories(client: TestClient, auth_headers: dict, setup_search_test_data):
     """Test searching oral histories."""
     search_request = {
         "query": "family journey",
-        "include": [SearchResultType.ORAL_HISTORY],
+        "include": [SearchResultType.ORAL_HISTORY.value],
         "page": 1,
         "page_size": 10
     }
     
-    response = test_app.post(
+    response = client.post(
         "/search",
         json=search_request,
         headers=auth_headers
@@ -135,9 +93,9 @@ def test_search_oral_histories(test_app, auth_headers):
     assert len(data["results"]) > 0
     assert any(oh["title"] == TEST_ORAL_HISTORY["title"] for oh in data["results"])
 
-def test_search_suggestions(test_app, auth_headers):
+def test_search_suggestions(client: TestClient, auth_headers: dict, setup_search_test_data):
     """Test search suggestions."""
-    response = test_app.get(
+    response = client.get(
         "/search/suggestions",
         params={"q": "family"},
         headers=auth_headers
@@ -149,7 +107,7 @@ def test_search_suggestions(test_app, auth_headers):
     assert data["query"] == "family"
     assert "stories" in data or "oral_histories" in data
 
-def test_search_with_filters(test_app, auth_headers):
+def test_search_with_filters(client: TestClient, auth_headers: dict, setup_search_test_data):
     """Test search with filters."""
     search_request = {
         "query": "test",
@@ -160,7 +118,7 @@ def test_search_with_filters(test_app, auth_headers):
         "page_size": 10
     }
     
-    response = test_app.post(
+    response = client.post(
         "/search",
         json=search_request,
         headers=auth_headers
@@ -172,9 +130,9 @@ def test_search_with_filters(test_app, auth_headers):
     assert data["page"] == 1
     assert data["page_size"] == 10
 
-def test_search_model_endpoint(test_app, auth_headers):
+def test_search_model_endpoint(client: TestClient, auth_headers: dict, setup_search_test_data):
     """Test the model-specific search endpoint."""
-    response = test_app.get(
+    response = client.get(
         "/search/models/stories",
         params={"q": "family"},
         headers=auth_headers

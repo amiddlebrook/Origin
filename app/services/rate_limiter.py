@@ -50,7 +50,7 @@ class RateLimiter:
         }
     
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        ""
+        """
         ASGI middleware to handle rate limiting.
         """
         if scope["type"] != "http":  # pragma: no cover

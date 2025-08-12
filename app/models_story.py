@@ -3,7 +3,17 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.schema import FetchedValue
 from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.types import TypeDecorator, TEXT
 from app.database import Base
+
+class TSText(TypeDecorator):
+    impl = TEXT
+    cache_ok = True
+
+@compiles(TSVECTOR, 'sqlite')
+def compile_tsvector_sqlite(type_, compiler, **kw):
+    return "TEXT"
 
 class SearchMixin:
     """Mixin that adds search functionality to models."""
@@ -69,9 +79,6 @@ class NameStory(SearchMixin, Base):
     sources = Column(JSON, nullable=True)
     illustration_url = Column(String(512), nullable=True)
     
-    # Search
-    search_vector = Column(TSVECTOR, index=True)
-    
     # Status
     status = Column(String(50), default="pending", nullable=False, index=True)
     
@@ -114,9 +121,6 @@ class OralHistory(SearchMixin, Base):
     audio_url = Column(String(512), nullable=False)
     transcript = Column(Text, nullable=True)
     summary = Column(Text, nullable=True)
-    
-    # Search
-    search_vector = Column(TSVECTOR, index=True)
     
     # Metadata
     duration_seconds = Column(Integer, nullable=True, index=True)

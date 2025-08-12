@@ -21,7 +21,7 @@ async def bulk_create_research(
     skip_duplicates: bool = Query(True, description="Skip duplicate items"),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk create research items.
     
@@ -46,7 +46,7 @@ async def bulk_update_research(
     items: List[Dict[str, Any]] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk update research items.
     
@@ -69,7 +69,7 @@ async def bulk_delete_research(
     research_ids: List[int] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk delete research items.
     
@@ -94,7 +94,7 @@ async def bulk_create_stories(
     skip_duplicates: bool = Query(True, description="Skip duplicate items"),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk create name stories.
     
@@ -119,7 +119,7 @@ async def bulk_update_stories(
     items: List[Dict[str, Any]] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk update name stories.
     
@@ -142,7 +142,7 @@ async def bulk_delete_stories(
     story_ids: List[int] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk delete name stories.
     
@@ -167,7 +167,7 @@ async def bulk_create_oral_histories(
     skip_duplicates: bool = Query(True, description="Skip duplicate items"),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk create oral histories.
     
@@ -192,7 +192,7 @@ async def bulk_update_oral_histories(
     items: List[Dict[str, Any]] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk update oral histories.
     
@@ -215,7 +215,7 @@ async def bulk_delete_oral_histories(
     oral_history_ids: List[int] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk delete oral histories.
     
@@ -240,7 +240,7 @@ async def bulk_add_to_workspace(
     resources: List[Dict[str, Any]] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk add resources to a workspace.
     
@@ -265,7 +265,7 @@ async def bulk_remove_from_workspace(
     resource_ids: List[Dict[str, Any]] = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
     service: BulkOperationsService = Depends(get_bulk_operations_service)
-):
+) -> Dict[str, Any]:
     """
     Bulk remove resources from a workspace.
     

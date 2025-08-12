@@ -9,7 +9,7 @@ from ..base import BaseSchema
 
 class ResearchBase(BaseSchema):
     """Base schema for research data."""
-    title: str
+    name: str
     description: Optional[str] = None
     content: Optional[Any] = None
     is_public: bool = False
@@ -22,7 +22,7 @@ class ResearchCreate(ResearchBase):
 
 class ResearchUpdate(BaseSchema):
     """Schema for updating an existing research item."""
-    title: Optional[str] = None
+    name: Optional[str] = None
     description: Optional[str] = None
     content: Optional[Any] = None
     is_public: Optional[bool] = None

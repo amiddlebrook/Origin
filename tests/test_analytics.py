@@ -22,13 +22,11 @@ TEST_USER = {
 }
 
 # Fixture to override the get_db dependency
-def override_get_db():
-    from app.database import SessionLocal
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@pytest.fixture(scope="module")
+async def db():
+    from app.database import AsyncSessionLocal
+    async with AsyncSessionLocal() as session:
+        yield session
 
 # Fixture to override the get_current_user dependency
 def override_get_current_user():
@@ -40,11 +38,10 @@ def override_get_current_user():
     )
 
 # Apply the overrides
-app.dependency_overrides[get_db] = override_get_db
 app.dependency_overrides[get_current_user] = override_get_current_user
 
 @pytest.fixture(autouse=True)
-def setup_test_data(db: AsyncSession):
+async def setup_test_data(db: AsyncSession):
     """Set up test data for analytics tests."""
     # Create a test user
     user = User(

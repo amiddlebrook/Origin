@@ -4,6 +4,7 @@ Tests for the media upload API endpoints.
 import os
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession
 from PIL import Image
 import io
 import tempfile
@@ -11,9 +12,53 @@ from pathlib import Path
 
 from app.main import app
 from app.core.config import settings
+from app.database import get_db, Base, AsyncSessionLocal
+from app.models_user import User
+from app.auth.schemas import UserCreate
+from app.auth.utils import get_password_hash
 
 # Test client
 client = TestClient(app)
+
+TEST_USER = {
+    "email": "test_media@example.com",
+    "password": "testpassword123",
+    "full_name": "Test User"
+}
+
+@pytest.fixture(scope="module")
+async def db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+@pytest.fixture(scope="module")
+def client(db: AsyncSession):
+    app.dependency_overrides[get_db] = lambda: db
+    with TestClient(app) as c:
+        yield c
+
+@pytest.fixture(scope="module")
+async def test_user(db: AsyncSession):
+    user_data = UserCreate(**TEST_USER)
+    user = User(
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password),
+        full_name=user_data.full_name,
+        is_active=True
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+@pytest.fixture(scope="module")
+def auth_headers(client: TestClient, test_user: User):
+    response = client.post(
+        "/auth/token",
+        data={"username": TEST_USER["email"], "password": TEST_USER["password"]}
+    )
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
 
 # Test image data
 def create_test_image():
@@ -32,7 +77,7 @@ def create_test_video():
     return io.BytesIO(video_data)
 
 # Test image upload
-def test_upload_image():
+def test_upload_image(client: TestClient, auth_headers: dict):
     """Test uploading an image file."""
     # Create a test image
     test_image = create_test_image()
@@ -43,7 +88,7 @@ def test_upload_image():
     }
     
     # Make the request
-    response = client.post("/media/upload/image", files=files)
+    response = client.post("/media/upload/image", headers=auth_headers, files=files)
     
     # Check the response
     assert response.status_code == 201
@@ -67,7 +112,7 @@ def test_upload_image():
         os.remove(data["thumbnail_path"])
 
 # Test video upload
-def test_upload_video():
+def test_upload_video(client: TestClient, auth_headers: dict):
     """Test uploading a video file."""
     # Create a test video
     test_video = create_test_video()
@@ -78,7 +123,7 @@ def test_upload_video():
     }
     
     # Make the request
-    response = client.post("/media/upload/video", files=files)
+    response = client.post("/media/upload/video", headers=auth_headers, files=files)
     
     # Check the response
     assert response.status_code == 201
@@ -101,7 +146,7 @@ def test_upload_video():
         os.remove(data["thumbnail_path"])
 
 # Test unsupported file type
-def test_unsupported_file_type():
+def test_unsupported_file_type(client: TestClient, auth_headers: dict):
     """Test uploading an unsupported file type."""
     # Create a test file with unsupported type
     files = {
@@ -109,15 +154,15 @@ def test_unsupported_file_type():
     }
     
     # Try to upload as image
-    response = client.post("/media/upload/image", files=files)
+    response = client.post("/media/upload/image", headers=auth_headers, files=files)
     assert response.status_code == 400
     
     # Try to upload as video
-    response = client.post("/media/upload/video", files=files)
+    response = client.post("/media/upload/video", headers=auth_headers, files=files)
     assert response.status_code == 400
 
 # Test file size limit
-def test_file_size_limit():
+def test_file_size_limit(client: TestClient, auth_headers: dict):
     """Test uploading a file that exceeds size limits."""
     # Create a large file (exceeds default 10MB limit for images)
     large_file = io.BytesIO(b'\x00' * (11 * 1024 * 1024))  # 11MB
@@ -126,7 +171,7 @@ def test_file_size_limit():
     files = {
         'file': ('large_image.jpg', large_file, 'image/jpeg')
     }
-    response = client.post("/media/upload/image", files=files)
+    response = client.post("/media/upload/image", headers=auth_headers, files=files)
     assert response.status_code == 413  # Payload Too Large
     
     # Create a very large file (exceeds video size limit)
@@ -136,11 +181,11 @@ def test_file_size_limit():
     files = {
         'file': ('large_video.mp4', large_video, 'video/mp4')
     }
-    response = client.post("/media/upload/video", files=files)
+    response = client.post("/media/upload/video", headers=auth_headers, files=files)
     assert response.status_code == 500  # Server error due to size limit
 
 # Test getting supported formats
-def test_get_supported_formats():
+def test_get_supported_formats(client: TestClient):
     """Test getting the list of supported file formats."""
     response = client.get("/media/supported-formats")
     assert response.status_code == 200

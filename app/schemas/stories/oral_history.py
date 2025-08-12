@@ -2,7 +2,7 @@
 Oral History related Pydantic models for request and response validation.
 """
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Any
 from pydantic import Field, HttpUrl
 
 from ..base import BaseSchema

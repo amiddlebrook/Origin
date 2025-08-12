@@ -4,9 +4,7 @@ Analytics models for tracking user activity and usage statistics.
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from app.database import Base
 
 class UserActivity(Base):
     """Tracks user activities across the application."""
@@ -52,9 +50,6 @@ class ContentInteraction(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
     
     # Index for faster lookups by content
-    __table_args__ = (
-        {'sqlite_autoindex': True},
-    )
     
     # Relationships
     user = relationship("User", back_populates="content_interactions")

@@ -7,16 +7,13 @@ def _unique_email():
     return f"tester+{uuid.uuid4().hex[:8]}@example.com"
 
 
-def test_protected_endpoints_require_auth():
-    client = TestClient(app)
+def test_protected_endpoints_require_auth(client: TestClient):
     # stories list should require auth
     resp = client.get("/stories")
     assert resp.status_code in (401, 403)
 
 
-def test_register_and_login_and_create_research():
-    client = TestClient(app)
-
+def test_register_and_login_and_create_research(client: TestClient):
     email = _unique_email()
     password = "passw0rd!"
 

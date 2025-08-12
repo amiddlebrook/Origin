@@ -179,10 +179,18 @@ class AnalyticsService:
         daily_query = daily_query.group_by('date')
         daily_results = (await self.db.execute(daily_query)).all()
         
+        # Ensure date is a datetime object before calling isoformat
+        daily_activity_processed = []
+        for r in daily_results:
+            date_obj = r[0]
+            if isinstance(date_obj, str):
+                date_obj = datetime.fromisoformat(date_obj)
+            daily_activity_processed.append({'date': date_obj.isoformat(), 'count': r[1]})
+
         return {
             'total_activities': total,
             'activity_types': [{'type': r[0], 'count': r[1]} for r in type_results],
-            'daily_activity': [{'date': r[0].isoformat(), 'count': r[1]} for r in daily_results]
+            'daily_activity': daily_activity_processed
         }
     
     async def get_search_analytics(

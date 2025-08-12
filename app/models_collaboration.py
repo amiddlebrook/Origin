@@ -25,6 +25,7 @@ class Workspace(Base):
     members: Mapped[List["WorkspaceMember"]] = relationship("WorkspaceMember", back_populates="workspace", cascade="all, delete-orphan")
     resources: Mapped[List["WorkspaceResource"]] = relationship("WorkspaceResource", back_populates="workspace", cascade="all, delete-orphan")
     
+    __table_args__ = {'extend_existing': True}
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
@@ -50,6 +51,7 @@ class WorkspaceMember(Base):
     workspace: Mapped["Workspace"] = relationship("Workspace", back_populates="members")
     user: Mapped["User"] = relationship("User", back_populates="workspace_memberships")
     
+    __table_args__ = {'extend_existing': True}
     def to_dict(self) -> Dict[str, Any]:
         return {
             "workspace_id": self.workspace_id,
@@ -78,6 +80,7 @@ class WorkspaceResource(Base):
     workspace: Mapped["Workspace"] = relationship("Workspace", back_populates="resources")
     added_by: Mapped["User"] = relationship("User")
     
+    __table_args__ = {'extend_existing': True}
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
@@ -107,6 +110,7 @@ class Comment(Base):
     parent_comment: Mapped[Optional["Comment"]] = relationship("Comment", remote_side=[id], back_populates="replies")
     replies: Mapped[List["Comment"]] = relationship("Comment", back_populates="parent_comment", cascade="all, delete-orphan")
     
+    __table_args__ = {'extend_existing': True}
     def to_dict(self, include_replies: bool = True) -> Dict[str, Any]:
         result = {
             "id": self.id,
@@ -138,7 +142,7 @@ class Annotation(Base):
     resource_id: Mapped[int] = mapped_column(Integer, nullable=False)
     annotation_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'highlight', 'note', 'comment', etc.
     content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)  # For storing position, color, etc.
+    annotation_metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)  # For storing position, color, etc.
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
@@ -147,6 +151,7 @@ class Annotation(Base):
     # Relationships
     created_by: Mapped["User"] = relationship("User")
     
+    __table_args__ = {'extend_existing': True}
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
@@ -154,7 +159,7 @@ class Annotation(Base):
             "resource_id": self.resource_id,
             "annotation_type": self.annotation_type,
             "content": self.content,
-            "metadata": self.metadata,
+            "annotation_metadata": self.annotation_metadata,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "created_by": {
@@ -181,6 +186,7 @@ class VersionHistory(Base):
     # Relationships
     created_by: Mapped["User"] = relationship("User")
     
+    __table_args__ = {'extend_existing': True}
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,

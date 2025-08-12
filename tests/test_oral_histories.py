@@ -4,10 +4,54 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from unittest.mock import patch, MagicMock
+from app.main import app
+from app.database import get_db, Base, AsyncSessionLocal
+from app.models_user import User
+from app.auth.schemas import UserCreate
+from app.auth.utils import get_password_hash
 
 # Test data
 TEST_AUDIO_FILE = "test_audio.wav"
 TEST_TITLE = "Test Oral History"
+TEST_USER = {
+    "email": "test_oral_histories@example.com",
+    "password": "testpassword123",
+    "full_name": "Test User"
+}
+
+@pytest.fixture(scope="module")
+async def db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+@pytest.fixture(scope="module")
+def client(db: AsyncSession):
+    app.dependency_overrides[get_db] = lambda: db
+    with TestClient(app) as c:
+        yield c
+
+@pytest.fixture(scope="module")
+async def test_user(db: AsyncSession):
+    user_data = UserCreate(**TEST_USER)
+    user = User(
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password),
+        full_name=user_data.full_name,
+        is_active=True
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+@pytest.fixture(scope="module")
+def auth_headers(client: TestClient, test_user: User):
+    response = client.post(
+        "/auth/token",
+        data={"username": TEST_USER["email"], "password": TEST_USER["password"]}
+    )
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
 
 @pytest.fixture
 def audio_file():

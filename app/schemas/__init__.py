@@ -53,8 +53,15 @@ from .analytics import (
     StorageUsageData
 )
 
-# Search schemas (kept for backward compatibility)
-from .search import *  # noqa: F403
+# Search schemas
+from .search import (
+    SearchResultType,
+    SearchResultItem,
+    SearchResponse,
+    SearchSuggestionItem,
+    SearchSuggestionsResponse,
+    SearchRequest
+)
 
 # Re-export all schemas
 __all__ = [
@@ -100,12 +107,13 @@ __all__ = [
     'ApiUsageData',
     'StorageUsageData',
     
-    # Search (legacy)
-    'SearchType',
-    
-    # Root schemas
-    'ResearchOut'
+    # Search
+    'SearchResultType',
+    'SearchResultItem',
+    'SearchResponse',
+    'SearchSuggestionItem',
+    'SearchSuggestionsResponse',
+    'SearchRequest'
 ]
 
 # Import other schemas from the root schemas.py
-from ..schemas import *  # noqa: F403

@@ -1,7 +1,7 @@
 """
 Base schemas and configurations used throughout the application.
 """
-from .base import (
+from .schemas import (
     BaseSchema,
     PaginatedResponse,
     Message,

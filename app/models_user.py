@@ -22,3 +22,5 @@ class User(Base):
     activities = relationship("UserActivity", back_populates="user", cascade="all, delete-orphan")
     search_queries = relationship("SearchQuery", back_populates="user", cascade="all, delete-orphan")
     content_interactions = relationship("ContentInteraction", back_populates="user", cascade="all, delete-orphan")
+    created_workspaces = relationship("Workspace", back_populates="created_by")
+    workspace_memberships = relationship("WorkspaceMember", back_populates="user")

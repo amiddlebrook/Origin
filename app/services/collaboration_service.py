@@ -8,6 +8,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, and_, or_, func
 from sqlalchemy.orm import selectinload, joinedload
+from fastapi import Depends
 
 from app.database import get_db
 from app.models_user import User

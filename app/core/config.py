@@ -18,8 +18,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["*"]
     # File storage
     ARTIFACTS_DIR: str = "data/artifacts"
-    MEDIA_DIR: str = "data/media"
-    MEDIA_UPLOAD_DIR: str = "data/media/uploads"
+    MEDIA_UPLOAD_DIR: str = "data/media"
     
     # Media processing
     MAX_IMAGE_SIZE_MB: int = 10  # 10MB max image size

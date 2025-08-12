@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     logger.info("Ensuring DB tables exist")
     # Ensure data dirs exist
     os.makedirs(settings.ARTIFACTS_DIR, exist_ok=True)
-    os.makedirs(settings.MEDIA_DIR, exist_ok=True)
+    # The media upload dir is created later, when the app is created.
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield

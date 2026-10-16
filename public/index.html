@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14282b">
+  <meta name="description" content="Origin is a private home for researching names, documenting family stories and preserving the voices behind them.">
+  <title>Origin — Where every name has a story</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#home" aria-label="Origin home"><span class="brand-symbol">O<span class="brand-dot">.</span></span><span class="brand-words">ORIGIN<small>THE LIVING ARCHIVE</small></span></a>
+    <div class="side-group-label">WORKSPACE</div>
+    <nav aria-label="Main navigation" id="nav">
+      <a href="#home" data-page="home" class="nav-link active"><span class="nav-icon">◈</span> Overview</a>
+      <a href="#explore" data-page="explore" class="nav-link"><span class="nav-icon">⌕</span> Name explorer</a>
+      <a href="#stories" data-page="stories" class="nav-link"><span class="nav-icon">▤</span> My stories <span class="nav-count" id="stories-count">0</span></a>
+      <a href="#memories" data-page="memories" class="nav-link"><span class="nav-icon">◉</span> Voice archive</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="archive-illustration" aria-hidden="true"><div class="ring a"></div><div class="ring b"></div><div class="ring c"></div><div class="dot"></div></div><p>Your history is worth<br>holding onto.</p><small>A thoughtful place to discover, write, and remember.</small></div>
+    <div class="side-foot">ORIGIN ARCHIVE <span>© 2026</span></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><button class="mobile-menu" id="menu-toggle" aria-label="Toggle navigation">☰</button><div class="breadcrumbs"><span>PERSONAL ARCHIVE</span><span class="slash">/</span><strong id="breadcrumb">Overview</strong></div><div class="top-right"><span class="status-ping"></span><span class="secure-label">PRIVATE WORKSPACE</span><button class="account-button" id="account-button">Sign in <span>↗</span></button></div></header>
+    <main id="main">
+      <section class="page active" id="page-home">
+        <div class="hero"><div class="hero-copy"><div class="eyebrow"><span class="line"></span> THE STORY BEHIND THE NAME</div><h1>Every name has<br><em>an origin.</em></h1><p>Trace the meaning behind a name, collect the stories that shaped it, and preserve the voices worth remembering.</p><div class="hero-actions"><button class="button primary" data-navigate="explore">Explore a name <span>↗</span></button><button class="button ghost" data-navigate="stories">View your stories <span>→</span></button></div></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-1"></div><div class="orbit orbit-2"></div><div class="orbit orbit-3"></div><div class="orbit orbit-4"></div><div class="hero-letter">O</div><div class="artifact-label">EST. IN MEMORY <span>✣</span> CARRIED FORWARD</div></div><div class="hero-index">01 — DISCOVER YOUR STORY</div></div>
+        <div class="section-heading"><div><span class="overline">A HOME FOR YOUR HISTORY</span><h2>Start your journey</h2></div><span class="section-caption">THREE WAYS TO BEGIN <span>↘</span></span></div>
+        <div class="feature-grid"><button class="feature-card" data-navigate="explore"><span class="feature-top">01 <span>↗</span></span><span class="feature-symbol">⌕</span><strong>Explore your name</strong><span class="feature-copy">Search historical references and uncover the places a name might lead.</span><span class="feature-bottom">BEGIN EXPLORING <span>→</span></span></button><button class="feature-card" data-navigate="stories"><span class="feature-top">02 <span>↗</span></span><span class="feature-symbol">✎</span><strong>Write your story</strong><span class="feature-copy">Turn discoveries and family memories into a lasting personal narrative.</span><span class="feature-bottom">OPEN STORY STUDIO <span>→</span></span></button><button class="feature-card" data-navigate="memories"><span class="feature-top">03 <span>↗</span></span><span class="feature-symbol">♫</span><strong>Preserve a voice</strong><span class="feature-copy">Record the voices and memories that make history feel alive.</span><span class="feature-bottom">OPEN VOICE ARCHIVE <span>→</span></span></button></div>
+        <div class="bottom-note"><span class="asterisk">✳</span> History begins with a question. <span>What will you discover?</span></div>
+      </section>
+      <section class="page" id="page-explore"><div class="page-head"><div><span class="overline">01 / NAME RESEARCH</span><h1>Every story<br>starts <em>somewhere.</em></h1><p>Search a first name or surname across public historical references. Discover clues, then keep the ones that matter.</p></div><div class="head-stamp">LOOK CLOSER.<br><em>GO DEEPER.</em></div></div><form id="search-form" class="search-panel"><label for="name-input">A NAME TO EXPLORE</label><div class="search-input-wrap"><span class="search-mark">⌕</span><input id="name-input" type="text" maxlength="80" required placeholder="Try a family name, like Ellis or Avery" autocomplete="off"><button type="submit" class="button primary" id="search-button">Explore name <span>↗</span></button></div><p>Reference searches use Wikipedia and Wiktionary. Results are research leads, not proof of ancestry.</p></form><div id="research-result" aria-live="polite"><div class="empty-state small"><span>✣</span><h3>What’s in a name?</h3><p>Enter a name above to start uncovering its story.</p></div></div><div class="history-section"><div class="section-heading condensed"><div><span class="overline">YOUR RESEARCH</span><h2>Recent discoveries</h2></div></div><div id="research-list" class="stack-list"></div></div></section>
+      <section class="page" id="page-stories"><div class="page-head"><div><span class="overline">02 / STORY STUDIO</span><h1>Some stories are<br>worth <em>keeping.</em></h1><p>Write down what you know, keep your sources close, and shape a narrative you can pass forward.</p></div><button class="button primary new-story" id="new-story-button">New story <span>＋</span></button></div><div class="story-toolbar"><span>YOUR COLLECTION <span id="story-total">0 STORIES</span></span><span>WORDS MAKE MEMORY LAST</span></div><div id="story-list" class="story-grid"></div></section>
+      <section class="page" id="page-memories"><div class="page-head"><div><span class="overline">03 / VOICE ARCHIVE</span><h1>Let their words<br><em>live on.</em></h1><p>The details fade. A familiar voice stays. Record a story and keep a copy safe on your device.</p></div><div class="head-stamp waveform">▂ ▄ ▆ ▃ ▇ ▄ ▂</div></div><div class="voice-panel"><div><span class="overline">RECORD A MEMORY</span><h2>A voice is a time capsule.</h2><p>Your recording stays in this browser. Download a copy to preserve it across devices or browser resets.</p></div><div class="record-controls"><input id="record-title" maxlength="140" placeholder="Give this memory a title" aria-label="Recording title"><button class="record-button" id="record-button" aria-label="Start recording"><span></span></button><strong id="record-clock">00:00</strong><span id="record-state">READY TO RECORD</span></div></div><div class="history-section"><div class="section-heading condensed"><div><span class="overline">LOCAL RECORDINGS</span><h2>Voices saved here</h2></div><span class="section-caption">DEVICE-LOCAL AUDIO</span></div><div id="recordings-list" class="stack-list"></div></div></section>
+    </main>
+    <footer class="footer"><span>ORIGIN <span class="foot-dot">✳</span> THE LIVING ARCHIVE</span><span>Every name is a beginning, not a conclusion.</span></footer>
+  </div>
+</div>
+<div class="modal-backdrop" id="modal-backdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading"><button class="modal-close" id="modal-close" aria-label="Close dialog">×</button><div id="modal-content"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

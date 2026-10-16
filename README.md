@@ -70,26 +70,24 @@ The tests exercise route validation, name normalization, narrative disclaimers, 
 
 ## One-time production setup (Free plan)
 
-1. Create a [Cloudflare Workers Free](https://dash.cloudflare.com/) account, and locate your **Account ID**.
-2. Create a D1 database in your Cloudflare account named `origin-archive-db`:
-   ```bash
-   npx wrangler login
-   npx wrangler d1 create origin-archive-db
-   ```
-   Copy the `database_id` from the output. Do **not** commit it into the placeholder configuration unless intentionally configuring your own deployment.
-3. Create a scoped Cloudflare API token with permission to deploy Workers and edit D1 for this account. Prefer the narrowest resource/permissions possible. Store it in GitHub Actions secrets, not source control.
-4. In **GitHub → Origin → Settings → Secrets and variables → Actions**, add these **repository secrets**:
+1. Use a [Cloudflare Workers Free](https://dash.cloudflare.com/) account and copy its account ID.
+2. Create a scoped Cloudflare API token with permission to deploy Workers and create/edit D1 databases in that account.
+3. In **GitHub → Origin → Settings → Secrets and variables → Actions**, create these **two repository secrets**:
 
    | Name | Value |
    |---|---|
-   | `CLOUDFLARE_API_TOKEN` | Scoped API token for Workers deployment and D1 migrations |
-   | `CLOUDFLARE_ACCOUNT_ID` | Account ID from the Cloudflare dashboard |
-   | `CLOUDFLARE_D1_DATABASE_ID` | UUID returned by `wrangler d1 create` |
+   | `CLOUDFLARE_API_TOKEN` | Scoped Cloudflare API token for Workers + D1 |
+   | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
 
-5. If you use a protected GitHub `production` environment, ensure the workflow can deploy to it. Otherwise the named environment is created automatically where permitted.
-6. Merge the restoration PR into `main` or push to `main`. GitHub Actions will run the JavaScript checks and tests, apply pending **remote** D1 migrations, then deploy the Worker and static assets to your `workers.dev` subdomain. Or manually start **Actions → Test and deploy Origin → Run workflow** after the merge.
+4. Push to `main` or run **Actions → Test and deploy Origin → Run workflow**. CI automatically runs `wrangler d1 list --json` and, if absent, `wrangler d1 create origin-archive-db`. It discovers the UUID, applies remote migrations, deploys static assets and Worker, then verifies the production site.
+5. The `CLOUDFLARE_D1_DATABASE_ID` secret is **not required**. If you previously set it, its value must match the Wrangler-discovered database ID.
+6. The initial verified production deployment is at **https://origin-archive.averymiddlebrook2014.workers.dev**. The site runs on Workers and D1 within their respective Free plan quotas. No paid third-party provider is required.
 
-**Important:** Without those Cloudflare account secrets and a real D1 database ID, the test job can pass but the deployment job will fail with an explicit missing-secret or D1-config error. Merging code does not itself prove a working public site.
+### Troubleshooting
+
+If the GitHub deploy job fails at `wrangler d1 list` or `wrangler d1 create`, check that the token has **D1 Edit** permissions for the correct Cloudflare account. Workers deployment also requires Workers Scripts Edit permissions. If migrations fail, inspect the Cloudflare D1 migration logs and verify the database name in `wrangler.jsonc`.
+
+**Never post API tokens in GitHub issues, logs, or source control.**
 
 ## API reference
 
